@@ -109,7 +109,7 @@
         .plate-image {
             width: 280px;
             height: 140px;
-            background: #f8fafc;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -118,22 +118,31 @@
             position: relative;
             z-index: 1;
             overflow: hidden;
-            border: 2px solid #e2e8f0;
+            border: 3px solid #dee2e6;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .plate-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .plate-image .placeholder {
-            font-size: 1.2em;
-            color: #64748b;
-            font-weight: bold;
+        .plate-content {
             text-align: center;
-            padding: 10px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .plate-state-abbr {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            letter-spacing: 8px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .plate-tagline {
+            font-size: 0.7em;
+            color: #6c757d;
+            margin-top: 5px;
+            font-style: italic;
+            font-weight: 600;
         }
 
         .plate-name {
@@ -212,6 +221,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .results-header h2 {
@@ -257,24 +268,6 @@
             justify-content: center;
             font-weight: bold;
             font-size: 1.2em;
-        }
-
-        .rank-plate-img {
-            width: 80px;
-            height: 40px;
-            background: #f8fafc;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .rank-plate-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
         }
 
         .rank-info {
@@ -343,6 +336,11 @@
                 height: 110px;
             }
 
+            .plate-state-abbr {
+                font-size: 2em;
+                letter-spacing: 4px;
+            }
+
             h1 {
                 font-size: 1.8em;
             }
@@ -358,12 +356,6 @@
             margin-top: 15px;
             font-size: 0.9em;
             opacity: 0.8;
-        }
-
-        .image-error {
-            font-size: 0.8em;
-            color: #94a3b8;
-            font-style: italic;
         }
     </style>
 </head>
@@ -430,73 +422,60 @@
     </div>
 
     <script>
-        const states = [
-            'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
-            'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia',
-            'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
-            'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland',
-            'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-            'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey',
-            'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
-            'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
-            'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
-            'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-        ];
-
-        // Using a different image source - license plates from worldlicenseplates.com
-        const plateImages = {
-            'Alabama': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AL_GI.png',
-            'Alaska': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AK_PV.png',
-            'Arizona': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AZ_PV.png',
-            'Arkansas': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AR_PV.png',
-            'California': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_CA_PV.png',
-            'Colorado': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_CO_PV.png',
-            'Connecticut': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_CT_PV.png',
-            'Delaware': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_DE_PV.png',
-            'Florida': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_FL_PV.png',
-            'Georgia': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_GA_PV.png',
-            'Hawaii': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_HI_PV.png',
-            'Idaho': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_ID_PV.png',
-            'Illinois': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_IL_PV.png',
-            'Indiana': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_IN_PV.png',
-            'Iowa': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_IA_PV.png',
-            'Kansas': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_KS_PV.png',
-            'Kentucky': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_KY_PV.png',
-            'Louisiana': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_LA_PV.png',
-            'Maine': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_ME_PV.png',
-            'Maryland': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MD_PV.png',
-            'Massachusetts': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MA_PV.png',
-            'Michigan': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MI_PV.png',
-            'Minnesota': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MN_PV.png',
-            'Mississippi': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MS_PV.png',
-            'Missouri': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MO_PV.png',
-            'Montana': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MT_PV.png',
-            'Nebraska': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NE_PV.png',
-            'Nevada': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NV_PV.png',
-            'New Hampshire': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NH_PV.png',
-            'New Jersey': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NJ_PV.png',
-            'New Mexico': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NM_PV.png',
-            'New York': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NY_PV.png',
-            'North Carolina': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NC_PV.png',
-            'North Dakota': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_ND_PV.png',
-            'Ohio': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_OH_PV.png',
-            'Oklahoma': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_OK_PV.png',
-            'Oregon': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_OR_PV.png',
-            'Pennsylvania': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_PA_PV.png',
-            'Rhode Island': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_RI_PV.png',
-            'South Carolina': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_SC_PV.png',
-            'South Dakota': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_SD_PV.png',
-            'Tennessee': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_TN_PV.png',
-            'Texas': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_TX_PV.png',
-            'Utah': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_UT_PV.png',
-            'Vermont': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_VT_PV.png',
-            'Virginia': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_VA_PV.png',
-            'Washington': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WA_PV.png',
-            'West Virginia': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WV_PV.png',
-            'Wisconsin': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WI_PV.png',
-            'Wyoming': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WY_PV.png'
+        const stateData = {
+            'Alabama': { abbr: 'AL', tagline: 'Heart of Dixie' },
+            'Alaska': { abbr: 'AK', tagline: 'The Last Frontier' },
+            'Arizona': { abbr: 'AZ', tagline: 'Grand Canyon State' },
+            'Arkansas': { abbr: 'AR', tagline: 'The Natural State' },
+            'California': { abbr: 'CA', tagline: 'Golden State' },
+            'Colorado': { abbr: 'CO', tagline: 'Colorful Colorado' },
+            'Connecticut': { abbr: 'CT', tagline: 'Constitution State' },
+            'Delaware': { abbr: 'DE', tagline: 'The First State' },
+            'Florida': { abbr: 'FL', tagline: 'Sunshine State' },
+            'Georgia': { abbr: 'GA', tagline: 'Peach State' },
+            'Hawaii': { abbr: 'HI', tagline: 'Aloha State' },
+            'Idaho': { abbr: 'ID', tagline: 'Gem State' },
+            'Illinois': { abbr: 'IL', tagline: 'Land of Lincoln' },
+            'Indiana': { abbr: 'IN', tagline: 'Hoosier State' },
+            'Iowa': { abbr: 'IA', tagline: 'Hawkeye State' },
+            'Kansas': { abbr: 'KS', tagline: 'Sunflower State' },
+            'Kentucky': { abbr: 'KY', tagline: 'Bluegrass State' },
+            'Louisiana': { abbr: 'LA', tagline: 'Pelican State' },
+            'Maine': { abbr: 'ME', tagline: 'Vacationland' },
+            'Maryland': { abbr: 'MD', tagline: 'Old Line State' },
+            'Massachusetts': { abbr: 'MA', tagline: 'Bay State' },
+            'Michigan': { abbr: 'MI', tagline: 'Great Lakes State' },
+            'Minnesota': { abbr: 'MN', tagline: 'North Star State' },
+            'Mississippi': { abbr: 'MS', tagline: 'Magnolia State' },
+            'Missouri': { abbr: 'MO', tagline: 'Show Me State' },
+            'Montana': { abbr: 'MT', tagline: 'Big Sky Country' },
+            'Nebraska': { abbr: 'NE', tagline: 'Cornhusker State' },
+            'Nevada': { abbr: 'NV', tagline: 'Silver State' },
+            'New Hampshire': { abbr: 'NH', tagline: 'Live Free or Die' },
+            'New Jersey': { abbr: 'NJ', tagline: 'Garden State' },
+            'New Mexico': { abbr: 'NM', tagline: 'Land of Enchantment' },
+            'New York': { abbr: 'NY', tagline: 'Empire State' },
+            'North Carolina': { abbr: 'NC', tagline: 'Tar Heel State' },
+            'North Dakota': { abbr: 'ND', tagline: 'Peace Garden State' },
+            'Ohio': { abbr: 'OH', tagline: 'Buckeye State' },
+            'Oklahoma': { abbr: 'OK', tagline: 'Sooner State' },
+            'Oregon': { abbr: 'OR', tagline: 'Beaver State' },
+            'Pennsylvania': { abbr: 'PA', tagline: 'Keystone State' },
+            'Rhode Island': { abbr: 'RI', tagline: 'Ocean State' },
+            'South Carolina': { abbr: 'SC', tagline: 'Palmetto State' },
+            'South Dakota': { abbr: 'SD', tagline: 'Mount Rushmore State' },
+            'Tennessee': { abbr: 'TN', tagline: 'Volunteer State' },
+            'Texas': { abbr: 'TX', tagline: 'Lone Star State' },
+            'Utah': { abbr: 'UT', tagline: 'Beehive State' },
+            'Vermont': { abbr: 'VT', tagline: 'Green Mountain State' },
+            'Virginia': { abbr: 'VA', tagline: 'Old Dominion' },
+            'Washington': { abbr: 'WA', tagline: 'Evergreen State' },
+            'West Virginia': { abbr: 'WV', tagline: 'Mountain State' },
+            'Wisconsin': { abbr: 'WI', tagline: 'Badger State' },
+            'Wyoming': { abbr: 'WY', tagline: 'Cowboy State' }
         };
 
+        const states = Object.keys(stateData);
         let ratings = {};
         let matchHistory = [];
         let currentPair = null;
@@ -525,37 +504,24 @@
             return [shuffled[0], shuffled[1]];
         }
 
-        function loadPlateImage(state, side) {
-            const imgContainer = document.getElementById(`plate-img-${side}`);
-            const imageUrl = plateImages[state];
-            
-            if (imageUrl) {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                
-                img.onload = function() {
-                    imgContainer.innerHTML = `<img src="${imageUrl}" alt="${state} license plate">`;
-                };
-                
-                img.onerror = function() {
-                    // If image fails to load, show state name as placeholder
-                    imgContainer.innerHTML = `<div class="placeholder">${state}<br><span class="image-error">Image not available</span></div>`;
-                };
-                
-                img.src = imageUrl;
-            } else {
-                imgContainer.innerHTML = `<div class="placeholder">${state}</div>`;
-            }
+        function createPlateVisual(state) {
+            const data = stateData[state];
+            return `
+                <div class="plate-content">
+                    <div class="plate-state-abbr">${data.abbr}</div>
+                    <div class="plate-tagline">${data.tagline}</div>
+                </div>
+            `;
         }
 
         function loadNewPair() {
             currentPair = getRandomPair();
             
+            document.getElementById('plate-img-left').innerHTML = createPlateVisual(currentPair[0]);
+            document.getElementById('plate-img-right').innerHTML = createPlateVisual(currentPair[1]);
+            
             document.getElementById('plate-name-left').textContent = currentPair[0];
             document.getElementById('plate-name-right').textContent = currentPair[1];
-
-            loadPlateImage(currentPair[0], 'left');
-            loadPlateImage(currentPair[1], 'right');
 
             updateStats(currentPair[0], 'left');
             updateStats(currentPair[1], 'right');
@@ -651,15 +617,10 @@
                     ? `${item.wins}W - ${item.losses}L`
                     : 'Not yet ranked';
 
-                const plateImgHtml = plateImages[item.state] 
-                    ? `<img src="${plateImages[item.state]}" alt="${item.state}" onerror="this.style.display='none'">`
-                    : '';
-
                 rankItem.innerHTML = `
                     ${rankDisplay}
-                    <div class="rank-plate-img">${plateImgHtml}</div>
                     <div class="rank-info">
-                        <div class="rank-state">${item.state}</div>
+                        <div class="rank-state">${item.state} (${stateData[item.state].abbr})</div>
                         <div class="rank-record">${record}</div>
                     </div>
                     <div class="rank-score">${Math.round(item.score)}</div>
