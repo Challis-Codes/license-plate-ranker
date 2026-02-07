@@ -125,6 +125,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            display: block;
         }
 
         .plate-image .placeholder {
@@ -265,6 +266,9 @@
             border-radius: 4px;
             overflow: hidden;
             border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .rank-plate-img img {
@@ -356,18 +360,10 @@
             opacity: 0.8;
         }
 
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .image-error {
+            font-size: 0.8em;
+            color: #94a3b8;
+            font-style: italic;
         }
     </style>
 </head>
@@ -395,9 +391,7 @@
         <div id="battle-screen" class="hidden">
             <div class="battle-container">
                 <div class="plate-option" id="option-left" onclick="chooseWinner('left')">
-                    <div class="plate-image" id="plate-img-left">
-                        <div class="loading-spinner"></div>
-                    </div>
+                    <div class="plate-image" id="plate-img-left"></div>
                     <div class="plate-name" id="plate-name-left"></div>
                     <div class="plate-stats" id="plate-stats-left">No battles yet</div>
                 </div>
@@ -405,9 +399,7 @@
                 <div class="vs-divider">VS</div>
 
                 <div class="plate-option" id="option-right" onclick="chooseWinner('right')">
-                    <div class="plate-image" id="plate-img-right">
-                        <div class="loading-spinner"></div>
-                    </div>
+                    <div class="plate-image" id="plate-img-right"></div>
                     <div class="plate-name" id="plate-name-right"></div>
                     <div class="plate-stats" id="plate-stats-right">No battles yet</div>
                 </div>
@@ -451,58 +443,58 @@
             'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
         ];
 
-        // License plate image URLs - Using Wikipedia images
+        // Using a different image source - license plates from worldlicenseplates.com
         const plateImages = {
-            'Alabama': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Alabama_license_plate%2C_2019.png/300px-Alabama_license_plate%2C_2019.png',
-            'Alaska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Alaska_license_plate%2C_2022.png/300px-Alaska_license_plate%2C_2022.png',
-            'Arizona': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Arizona_license_plate%2C_2020.png/300px-Arizona_license_plate%2C_2020.png',
-            'Arkansas': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Arkansas_license_plate%2C_2019.png/300px-Arkansas_license_plate%2C_2019.png',
-            'California': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/California_license_plate%2C_2011%E2%80%93present_%28standard_issue%29.png/300px-California_license_plate%2C_2011%E2%80%93present_%28standard_issue%29.png',
-            'Colorado': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Colorado_license_plate%2C_2016.png/300px-Colorado_license_plate%2C_2016.png',
-            'Connecticut': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Connecticut_license_plate%2C_2022.png/300px-Connecticut_license_plate%2C_2022.png',
-            'Delaware': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Delaware_license_plate%2C_2021.png/300px-Delaware_license_plate%2C_2021.png',
-            'Florida': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Florida_license_plate%2C_2016.png/300px-Florida_license_plate%2C_2016.png',
-            'Georgia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Georgia_license_plate%2C_2021.png/300px-Georgia_license_plate%2C_2021.png',
-            'Hawaii': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Hawaii_license_plate%2C_2013.png/300px-Hawaii_license_plate%2C_2013.png',
-            'Idaho': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Idaho_license_plate%2C_2022.png/300px-Idaho_license_plate%2C_2022.png',
-            'Illinois': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Illinois_license_plate%2C_2017.png/300px-Illinois_license_plate%2C_2017.png',
-            'Indiana': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Indiana_license_plate%2C_2020.png/300px-Indiana_license_plate%2C_2020.png',
-            'Iowa': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Iowa_license_plate%2C_2022.png/300px-Iowa_license_plate%2C_2022.png',
-            'Kansas': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Kansas_license_plate%2C_2019.png/300px-Kansas_license_plate%2C_2019.png',
-            'Kentucky': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Kentucky_license_plate%2C_2021.png/300px-Kentucky_license_plate%2C_2021.png',
-            'Louisiana': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Louisiana_license_plate%2C_2021.png/300px-Louisiana_license_plate%2C_2021.png',
-            'Maine': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Maine_license_plate%2C_2021.png/300px-Maine_license_plate%2C_2021.png',
-            'Maryland': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Maryland_license_plate%2C_2020.png/300px-Maryland_license_plate%2C_2020.png',
-            'Massachusetts': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Massachusetts_license_plate%2C_2021.png/300px-Massachusetts_license_plate%2C_2021.png',
-            'Michigan': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Michigan_license_plate%2C_2021.png/300px-Michigan_license_plate%2C_2021.png',
-            'Minnesota': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Minnesota_license_plate%2C_2021.png/300px-Minnesota_license_plate%2C_2021.png',
-            'Mississippi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Mississippi_license_plate%2C_2019.png/300px-Mississippi_license_plate%2C_2019.png',
-            'Missouri': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Missouri_license_plate%2C_2020.png/300px-Missouri_license_plate%2C_2020.png',
-            'Montana': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Montana_license_plate%2C_2020.png/300px-Montana_license_plate%2C_2020.png',
-            'Nebraska': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Nebraska_license_plate%2C_2019.png/300px-Nebraska_license_plate%2C_2019.png',
-            'Nevada': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Nevada_license_plate%2C_2022.png/300px-Nevada_license_plate%2C_2022.png',
-            'New Hampshire': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/New_Hampshire_license_plate%2C_2022.png/300px-New_Hampshire_license_plate%2C_2022.png',
-            'New Jersey': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/New_Jersey_license_plate%2C_2024.png/300px-New_Jersey_license_plate%2C_2024.png',
-            'New Mexico': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/New_Mexico_license_plate%2C_2022.png/300px-New_Mexico_license_plate%2C_2022.png',
-            'New York': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/New_York_license_plate%2C_2020.png/300px-New_York_license_plate%2C_2020.png',
-            'North Carolina': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/North_Carolina_license_plate%2C_2021.png/300px-North_Carolina_license_plate%2C_2021.png',
-            'North Dakota': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/North_Dakota_license_plate%2C_2023.png/300px-North_Dakota_license_plate%2C_2023.png',
-            'Ohio': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Ohio_license_plate%2C_2023.png/300px-Ohio_license_plate%2C_2023.png',
-            'Oklahoma': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Oklahoma_license_plate%2C_2021.png/300px-Oklahoma_license_plate%2C_2021.png',
-            'Oregon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Oregon_license_plate%2C_2020.png/300px-Oregon_license_plate%2C_2020.png',
-            'Pennsylvania': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Pennsylvania_license_plate%2C_2021.png/300px-Pennsylvania_license_plate%2C_2021.png',
-            'Rhode Island': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Rhode_Island_license_plate%2C_2021.png/300px-Rhode_Island_license_plate%2C_2021.png',
-            'South Carolina': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/South_Carolina_license_plate%2C_2021.png/300px-South_Carolina_license_plate%2C_2021.png',
-            'South Dakota': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/South_Dakota_license_plate%2C_2023.png/300px-South_Dakota_license_plate%2C_2023.png',
-            'Tennessee': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tennessee_license_plate%2C_2021.png/300px-Tennessee_license_plate%2C_2021.png',
-            'Texas': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Texas_license_plate%2C_2019.png/300px-Texas_license_plate%2C_2019.png',
-            'Utah': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Utah_license_plate%2C_2020.png/300px-Utah_license_plate%2C_2020.png',
-            'Vermont': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Vermont_license_plate%2C_2021.png/300px-Vermont_license_plate%2C_2021.png',
-            'Virginia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Virginia_license_plate%2C_2021.png/300px-Virginia_license_plate%2C_2021.png',
-            'Washington': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Washington_license_plate%2C_2020.png/300px-Washington_license_plate%2C_2020.png',
-            'West Virginia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/West_Virginia_license_plate%2C_2022.png/300px-West_Virginia_license_plate%2C_2022.png',
-            'Wisconsin': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Wisconsin_license_plate%2C_2021.png/300px-Wisconsin_license_plate%2C_2021.png',
-            'Wyoming': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Wyoming_license_plate%2C_2020.png/300px-Wyoming_license_plate%2C_2020.png'
+            'Alabama': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AL_GI.png',
+            'Alaska': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AK_PV.png',
+            'Arizona': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AZ_PV.png',
+            'Arkansas': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_AR_PV.png',
+            'California': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_CA_PV.png',
+            'Colorado': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_CO_PV.png',
+            'Connecticut': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_CT_PV.png',
+            'Delaware': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_DE_PV.png',
+            'Florida': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_FL_PV.png',
+            'Georgia': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_GA_PV.png',
+            'Hawaii': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_HI_PV.png',
+            'Idaho': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_ID_PV.png',
+            'Illinois': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_IL_PV.png',
+            'Indiana': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_IN_PV.png',
+            'Iowa': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_IA_PV.png',
+            'Kansas': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_KS_PV.png',
+            'Kentucky': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_KY_PV.png',
+            'Louisiana': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_LA_PV.png',
+            'Maine': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_ME_PV.png',
+            'Maryland': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MD_PV.png',
+            'Massachusetts': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MA_PV.png',
+            'Michigan': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MI_PV.png',
+            'Minnesota': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MN_PV.png',
+            'Mississippi': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MS_PV.png',
+            'Missouri': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MO_PV.png',
+            'Montana': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_MT_PV.png',
+            'Nebraska': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NE_PV.png',
+            'Nevada': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NV_PV.png',
+            'New Hampshire': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NH_PV.png',
+            'New Jersey': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NJ_PV.png',
+            'New Mexico': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NM_PV.png',
+            'New York': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NY_PV.png',
+            'North Carolina': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_NC_PV.png',
+            'North Dakota': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_ND_PV.png',
+            'Ohio': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_OH_PV.png',
+            'Oklahoma': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_OK_PV.png',
+            'Oregon': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_OR_PV.png',
+            'Pennsylvania': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_PA_PV.png',
+            'Rhode Island': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_RI_PV.png',
+            'South Carolina': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_SC_PV.png',
+            'South Dakota': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_SD_PV.png',
+            'Tennessee': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_TN_PV.png',
+            'Texas': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_TX_PV.png',
+            'Utah': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_UT_PV.png',
+            'Vermont': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_VT_PV.png',
+            'Virginia': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_VA_PV.png',
+            'Washington': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WA_PV.png',
+            'West Virginia': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WV_PV.png',
+            'Wisconsin': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WI_PV.png',
+            'Wyoming': 'https://worldlicenseplates.com/wp-content/uploads/2018/03/US_WY_PV.png'
         };
 
         let ratings = {};
@@ -539,12 +531,17 @@
             
             if (imageUrl) {
                 const img = new Image();
+                img.crossOrigin = "anonymous";
+                
                 img.onload = function() {
                     imgContainer.innerHTML = `<img src="${imageUrl}" alt="${state} license plate">`;
                 };
+                
                 img.onerror = function() {
-                    imgContainer.innerHTML = `<div class="placeholder">${state}</div>`;
+                    // If image fails to load, show state name as placeholder
+                    imgContainer.innerHTML = `<div class="placeholder">${state}<br><span class="image-error">Image not available</span></div>`;
                 };
+                
                 img.src = imageUrl;
             } else {
                 imgContainer.innerHTML = `<div class="placeholder">${state}</div>`;
@@ -554,14 +551,9 @@
         function loadNewPair() {
             currentPair = getRandomPair();
             
-            // Show loading spinners
-            document.getElementById('plate-img-left').innerHTML = '<div class="loading-spinner"></div>';
-            document.getElementById('plate-img-right').innerHTML = '<div class="loading-spinner"></div>';
-            
             document.getElementById('plate-name-left').textContent = currentPair[0];
             document.getElementById('plate-name-right').textContent = currentPair[1];
 
-            // Load images
             loadPlateImage(currentPair[0], 'left');
             loadPlateImage(currentPair[1], 'right');
 
@@ -660,7 +652,7 @@
                     : 'Not yet ranked';
 
                 const plateImgHtml = plateImages[item.state] 
-                    ? `<img src="${plateImages[item.state]}" alt="${item.state}">`
+                    ? `<img src="${plateImages[item.state]}" alt="${item.state}" onerror="this.style.display='none'">`
                     : '';
 
                 rankItem.innerHTML = `
