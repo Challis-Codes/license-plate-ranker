@@ -56,7 +56,10 @@
     .subtitle {
         font-size: 1em;
     }
-
+.rank-plate-preview {
+        width: 70px;
+        height: 35px;
+    }
     .battle-container {
         grid-template-columns: 1fr;
         gap: 14px;
@@ -88,6 +91,7 @@
     letter-spacing: 2px;
     color: #1e293b;
 }
+    
 
 /* Desktop */
 @media (min-width: 769px) {
@@ -488,6 +492,24 @@
             font-size: 0.9em;
             opacity: 0.8;
         }
+        .rank-plate-preview {
+    width: 100px;
+    height: 50px;
+    background: #f8fafc;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.rank-plate-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
     </style>
 </head>
 <body>
@@ -722,52 +744,58 @@
         }
 
         function showResults() {
-            if (totalComparisons === 0) {
-                alert('Make at least one comparison before viewing rankings!');
-                return;
-            }
+    if (totalComparisons === 0) {
+        alert('Make at least one comparison before viewing rankings!');
+        return;
+    }
 
-            document.getElementById('battle-screen').classList.add('hidden');
-            document.getElementById('results-screen').classList.add('active');
+    document.getElementById('battle-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('active');
 
-            const rankingList = document.getElementById('ranking-list');
-            rankingList.innerHTML = '';
+    const rankingList = document.getElementById('ranking-list');
+    rankingList.innerHTML = '';
 
-            const sortedStates = states
-                .map(state => ({ state, ...ratings[state] }))
-                .sort((a, b) => b.score - a.score);
+    const sortedStates = states
+        .map(state => ({ state, ...ratings[state] }))
+        .sort((a, b) => b.score - a.score);
 
-            sortedStates.forEach((item, index) => {
-                const rankItem = document.createElement('div');
-                rankItem.className = 'ranking-item';
+    sortedStates.forEach((item, index) => {
+        const rankItem = document.createElement('div');
+        rankItem.className = 'ranking-item';
 
-                let rankDisplay;
-                if (index === 0) {
-                    rankDisplay = '<div class="rank-medal">🥇</div>';
-                } else if (index === 1) {
-                    rankDisplay = '<div class="rank-medal">🥈</div>';
-                } else if (index === 2) {
-                    rankDisplay = '<div class="rank-medal">🥉</div>';
-                } else {
-                    rankDisplay = `<div class="rank-number">${index + 1}</div>`;
-                }
-
-                const record = item.battles > 0 
-                    ? `${item.wins}W - ${item.losses}L`
-                    : 'Not yet ranked';
-
-                rankItem.innerHTML = `
-                    ${rankDisplay}
-                    <div class="rank-info">
-                        <div class="rank-state">${item.state} (${stateData[item.state].abbr})</div>
-                        <div class="rank-record">${record}</div>
-                    </div>
-                    <div class="rank-score">${Math.round(item.score)}</div>
-                `;
-
-                rankingList.appendChild(rankItem);
-            });
+        let rankDisplay;
+        if (index === 0) {
+            rankDisplay = '<div class="rank-medal">🥇</div>';
+        } else if (index === 1) {
+            rankDisplay = '<div class="rank-medal">🥈</div>';
+        } else if (index === 2) {
+            rankDisplay = '<div class="rank-medal">🥉</div>';
+        } else {
+            rankDisplay = `<div class="rank-number">${index + 1}</div>`;
         }
+
+        const record = item.battles > 0 
+            ? `${item.wins}W - ${item.losses}L`
+            : 'Not yet ranked';
+
+        // NEW: Add the plate image
+        const plateSrc = getPlateSrc(item.state);
+
+        rankItem.innerHTML = `
+            ${rankDisplay}
+            <div class="rank-plate-preview">
+                <img src="${plateSrc}" alt="${item.state}" onerror="this.style.display='none'">
+            </div>
+            <div class="rank-info">
+                <div class="rank-state">${item.state} (${stateData[item.state].abbr})</div>
+                <div class="rank-record">${record}</div>
+            </div>
+            <div class="rank-score">${Math.round(item.score)}</div>
+        `;
+
+        rankingList.appendChild(rankItem);
+    });
+}
 
         function continueBattle() {
             document.getElementById('results-screen').classList.remove('active');
