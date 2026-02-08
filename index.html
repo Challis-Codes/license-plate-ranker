@@ -521,6 +521,7 @@
                 <div class="progress-fill" id="progress-fill"></div>
             </div>
             <div class="progress-text" id="progress-text">0 comparisons made</div>
+            <div id="states-ranked" style="color: white; text-align: center; margin-top: 8px; font-size: 0.95em; font-weight: 600;"></div>
         </header>
 
         <!-- Intro Screen -->
@@ -651,7 +652,9 @@
             document.getElementById('intro-screen').classList.add('hidden');
             document.getElementById('battle-screen').classList.remove('hidden');
             initializeRatings();
+            updateProgress();
             loadNewPair();
+}
         }
 
         function getRandomPair() {
@@ -740,7 +743,19 @@
             const progress = Math.min((totalComparisons / minComparisons) * 100, 100);
             document.getElementById('progress-fill').style.width = progress + '%';
             document.getElementById('progress-text').textContent = 
-                `${totalComparisons} comparison${totalComparisons !== 1 ? 's' : ''} made`;
+            `${totalComparisons} comparison${totalComparisons !== 1 ? 's' : ''} made`;
+    
+    // Show how many states have been ranked
+    const rankedCount = Object.values(ratings).filter(r => r.battles > 0).length;
+    const statesRankedEl = document.getElementById('states-ranked');
+    if (statesRankedEl) {
+        if (rankedCount === 50) {
+            statesRankedEl.textContent = `✅ All 50 states ranked!`;
+        } else {
+            statesRankedEl.textContent = `${rankedCount}/50 states ranked`;
+        }
+    }
+}
         }
 
         function showResults() {
